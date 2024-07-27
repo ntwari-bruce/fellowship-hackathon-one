@@ -10,12 +10,12 @@ jwt = JWTManager()
 def create_app():
     app = Flask(__name__)
     app.config.from_object('config.Config')
+    cors = CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}}, supports_credentials=True)
 
-    # Enable CORS for specific origin
-    CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 
     db.init_app(app)
     jwt.init_app(app)
+    
 
     @app.route('/test', methods=['GET'])
     def test():
@@ -27,6 +27,7 @@ def create_app():
         response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
         response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
         response.headers.add('Access-Control-Allow-Credentials', 'true')
+       
         return response
 
     with app.app_context():

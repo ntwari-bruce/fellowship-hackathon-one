@@ -6,6 +6,7 @@ function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");  // State variable for error message
   const navigate = useNavigate();
 
   const handleUsernameChange = (event) => {
@@ -19,20 +20,27 @@ function Login() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      const response = await axios.post('http://localhost:5000/login', {
+      const response = await axios.post('http://127.0.0.1:5000/login', {
         username,
         password
       });
       const { access_token } = response.data;
       localStorage.setItem('token', access_token);
-      navigate('/');  // Navigate to the homepage after successful login
+      console.log("Login successful! Redirecting to homepage...");
+      navigate('/home');  // Navigate to the homepage after successful login
     } catch (error) {
+      if (error.response && error.response.data && error.response.data.message) {
+        setErrorMessage(error.response.data.message);  // Set error message from response
+      } else {
+        setErrorMessage("Invalid username or password");  // Set generic error message
+      }
       console.error('Login error', error);
     }
   };
 
   return (
     <form className="login-form" onSubmit={handleSubmit}>
+      {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}  {/* Conditionally render the error message */}
       <input type="text" className="input" autoComplete="off" placeholder="Username" value={username} onChange={handleUsernameChange}/>
       <input type="password" className="input" autoComplete="off" placeholder="Password" value={password} onChange={handlePasswordChange}/>
       <input 
